@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <meta
+      name="description"
+      content="Kopi Kalcer — PO kopi tiap Kamis di kelas 11G pas istirahat ke-2. Pilih menu, isi biodata, pesanan langsung masuk WhatsApp."
+    />
+    <meta name="theme-color" content="#241610" />
+    <title>Kopi Kalcer — PO Kamis di kelas 11G</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+
+  <body>
+    <a class="skip-link" href="#menu">Langsung ke menu</a>
+
+    <header class="topbar">
+      <a class="brand" href="#atas">
+        <span class="brand-mark">☕</span>
+        <span class="brand-name">Kopi Kalcer</span>
+      </a>
+
+      <nav class="topnav" aria-label="Navigasi utama">
+        <a href="#menu">Menu</a>
+        <a href="#jadwal">Jadwal</a>
+        <a href="#pesan">Pesan</a>
+      </nav>
+
+      <a class="topbar-cta" href="#pesan">
+        Pesan<span class="cta-extra"> sekarang</span>
+        <span class="topbar-count" id="topbar-count" hidden>0</span>
+      </a>
+    </header>
+
+    <main id="atas">
+      <!-- ============ HERO ============ -->
+      <section class="hero">
+        <div class="hero-inner">
+          <div class="hero-text">
+            <p class="hero-kick">PO Kamis ini udah dibuka</p>
+
+            <h1>
+              Dompet penuh gitu mah<br />
+              mending ngopi, lekk.
+            </h1>
+
+            <p class="hero-copy">
+              Kepala pusing abis ngerjain tugas, mapel masih jalan terus. Kamis
+              besok Kopi Kalcer balik lagi ke kelas 11G — pesan dari sekarang
+              biar minuman favoritmu aman.
+            </p>
+
+            <div class="hero-actions">
+              <a class="btn btn-primary" href="#menu">Lihat menu</a>
+              <a class="btn btn-ghost" href="#pesan">Isi form PO</a>
+            </div>
+
+            <p class="hero-stock" id="hero-stock">
+              Varian kopi tinggal <strong>10 shot espresso</strong>. Siapa cepat
+              dia dapat.
+            </p>
+          </div>
+
+          <figure class="hero-photo">
+            <div class="photo-frame photo-tilt">
+              <img
+                src="img/hero.jpg"
+                alt="Foto andalan Kopi Kalcer"
+                width="900"
+                height="1150"
+                onerror="this.closest('.photo-frame').classList.add('is-empty')"
+              />
+            </div>
+            <figcaption>Ganti fotonya di <code>img/hero.jpg</code></figcaption>
+          </figure>
+        </div>
+
+        <div class="ticker" aria-hidden="true">
+          <div class="ticker-track">
+            <span>Kamis</span><span>•</span><span>Kelas 11G</span><span>•</span
+            ><span>Istirahat ke-2</span><span>•</span><span>Mulai 10K</span
+            ><span>•</span><span>PO dibuka</span><span>•</span><span>Kamis</span
+            ><span>•</span><span>Kelas 11G</span><span>•</span
+            ><span>Istirahat ke-2</span><span>•</span><span>Mulai 10K</span
+            ><span>•</span><span>PO dibuka</span><span>•</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ JADWAL ============ -->
+      <section class="jadwal" id="jadwal">
+        <div class="wrap jadwal-grid">
+          <div class="jadwal-card">
+            <p class="jadwal-label">Hari</p>
+            <p class="jadwal-value">Kamis</p>
+            <p class="jadwal-note">Tiap minggu, selama stok masih ada</p>
+          </div>
+
+          <div class="jadwal-card">
+            <p class="jadwal-label">Tempat</p>
+            <p class="jadwal-value">Kelas 11G</p>
+            <p class="jadwal-note">Tinggal mampir, gausah jauh-jauh</p>
+          </div>
+
+          <div class="jadwal-card">
+            <p class="jadwal-label">Jam</p>
+            <p class="jadwal-value">Istirahat ke-2</p>
+            <p class="jadwal-note">Datang pas bel, pesanan PO udah siap</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ MENU ============ -->
+      <section class="menu" id="menu">
+        <div class="wrap">
+          <div class="menu-head">
+            <h2>Menu Kopi Kalcer</h2>
+            <p>
+              Pilih minumanmu, atur jumlahnya, nanti semuanya otomatis masuk ke
+              form pesanan di bawah.
+            </p>
+          </div>
+
+          <div class="menu-block">
+            <div class="block-head">
+              <h3>Serial kopi</h3>
+              <p class="block-badge">Sisa 10 shot espresso</p>
+            </div>
+            <div class="menu-grid" id="grid-kopi"></div>
+          </div>
+
+          <div class="menu-block menu-block-soft">
+            <div class="block-head">
+              <h3>Anti kopi? Bisa</h3>
+              <p class="block-badge block-badge-alt">Tanpa espresso</p>
+            </div>
+            <div class="menu-grid" id="grid-nonkopi"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ PESAN ============ -->
+      <section class="pesan" id="pesan">
+        <div class="wrap pesan-grid">
+          <div class="pesan-form">
+            <h2>Isi biodata dulu, baru pesan</h2>
+            <p class="pesan-sub">
+              Biodata dipakai buat nyocokin pesanan pas pengantaran. Tombol
+              pesan kebuka setelah data di bawah lengkap.
+            </p>
+
+            <form id="form-pesan" novalidate>
+              <div class="field">
+                <label for="nama">Nama lengkap</label>
+                <input
+                  id="nama"
+                  name="nama"
+                  type="text"
+                  autocomplete="name"
+                  placeholder="Contoh: Rangga Saputra"
+                  required
+                />
+                <p class="field-error" id="error-nama"></p>
+              </div>
+
+              <div class="field-row">
+                <div class="field">
+                  <label for="kelas">Kelas</label>
+                  <input
+                    id="kelas"
+                    name="kelas"
+                    type="text"
+                    placeholder="Contoh: 11G"
+                    required
+                  />
+                  <p class="field-error" id="error-kelas"></p>
+                </div>
+
+                <div class="field">
+                  <label for="wa">Nomor WhatsApp</label>
+                  <input
+                    id="wa"
+                    name="wa"
+                    type="tel"
+                    inputmode="numeric"
+                    autocomplete="tel"
+                    placeholder="08xxxxxxxxxx"
+                    required
+                  />
+                  <p class="field-error" id="error-wa"></p>
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="ambil">Mau diambil kapan</label>
+                <select id="ambil" name="ambil">
+                  <option value="Pas istirahat ke-2 di kelas 11G">
+                    Pas istirahat ke-2 di kelas 11G
+                  </option>
+                  <option value="Pas istirahat ke-1, nanti aku samperin">
+                    Pas istirahat ke-1, nanti aku samperin
+                  </option>
+                  <option value="Pulang sekolah">Pulang sekolah</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="catatan">
+                  Catatan <span class="opt">(opsional)</span>
+                </label>
+                <textarea
+                  id="catatan"
+                  name="catatan"
+                  rows="3"
+                  placeholder="Contoh: es-nya dikit aja, gulanya setengah"
+                ></textarea>
+              </div>
+            </form>
+          </div>
+
+          <aside class="struk-wrap">
+            <div class="struk">
+              <p class="struk-title">Kopi Kalcer</p>
+              <p class="struk-meta">Pre-order · Kamis · Kelas 11G</p>
+
+              <div class="struk-rule"></div>
+
+              <div class="struk-lines" id="struk-lines">
+                <p class="struk-empty">
+                  Belum ada pesanan. Pilih minuman di menu atas dulu.
+                </p>
+              </div>
+
+              <div class="struk-rule"></div>
+
+              <div class="struk-total">
+                <span>Total</span>
+                <strong id="struk-total">Rp0</strong>
+              </div>
+
+              <p class="struk-bayar">Bayar cash pas ambil pesanan</p>
+            </div>
+
+            <button class="btn-order is-locked" id="btn-order" type="button">
+              <span class="btn-order-lock" aria-hidden="true">🔒</span>
+              <span id="btn-order-text">Pesan lewat WhatsApp</span>
+            </button>
+
+            <p class="order-hint" id="order-hint">
+              Lengkapi biodata dan pilih minimal 1 minuman dulu ya.
+            </p>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="wrap footer-inner">
+        <div>
+          <p class="footer-brand">Kopi Kalcer</p>
+          <p class="footer-line">
+            Kamis, kelas 11G, istirahat ke-2. Ajak temen, ajak gebetan, ajak
+            siapa aja.
+          </p>
+        </div>
+
+        <div class="footer-contact">
+          <p class="footer-label">Tanya-tanya dulu?</p>
+          <a class="footer-wa" id="footer-wa" href="#"
+            >Chat +62 857-1130-8141</a
+          >
+        </div>
+      </div>
+
+      <p class="footer-copy">© <span id="tahun"></span> Kopi Kalcer</p>
+    </footer>
+
+    <!-- bar keranjang mengambang -->
+    <div class="cartbar" id="cartbar" hidden>
+      <div class="cartbar-info">
+        <span id="cartbar-count">0 item</span>
+        <strong id="cartbar-total">Rp0</strong>
+      </div>
+      <a class="cartbar-go" href="#pesan">Lanjut isi biodata</a>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <!-- ============ MODAL DETAIL MENU ============ -->
+    <dialog
+      class="detail-modal"
+      id="detail-modal"
+      aria-labelledby="detail-nama"
+    >
+      <form method="dialog">
+        <button
+          type="submit"
+          class="detail-tutup"
+          aria-label="Tutup detail menu"
+        >
+          ✕
+        </button>
+      </form>
+
+      <div class="detail-foto">
+        <img
+          id="detail-foto"
+          src=""
+          alt=""
+          onerror="this.closest('.detail-foto').classList.add('is-empty')"
+        />
+        <span class="detail-harga" id="detail-harga"></span>
+      </div>
+
+      <div class="detail-isi">
+        <p class="detail-kategori" id="detail-kategori"></p>
+        <h3 id="detail-nama"></h3>
+
+        <div class="detail-rating" id="detail-rating"></div>
+
+        <p class="detail-penjelasan" id="detail-penjelasan"></p>
+
+        <div class="stepper">
+          <button type="button" id="detail-kurang" aria-label="Kurangi jumlah">
+            −
+          </button>
+          <span class="stepper-jumlah" id="detail-jumlah">0</span>
+          <button type="button" id="detail-tambah" aria-label="Tambah jumlah">
+            +
+          </button>
+          <button type="button" class="stepper-tambah" id="detail-tambah-cta">
+            Tambah ke pesanan
+          </button>
+        </div>
+      </div>
+    </dialog>
+
+    <script src="js/script.js"></script>
+  </body>
+</html>
