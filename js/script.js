@@ -161,29 +161,6 @@ function toast(pesan) {
   timerToast = setTimeout(() => kotak.classList.remove("tampil"), 3200);
 }
 
-function simpan() {
-  try {
-    localStorage.setItem("kopi-kalcer-keranjang", JSON.stringify(keranjang));
-  } catch (e) {
-    /* kalau localStorage diblokir, keranjang tetap jalan selama halaman kebuka */
-  }
-}
-
-function muat() {
-  try {
-    const data = JSON.parse(localStorage.getItem("kopi-kalcer-keranjang"));
-    if (data && typeof data === "object") {
-      Object.entries(data).forEach(([id, jumlah]) => {
-        if (cariMenu(id) && Number.isFinite(jumlah) && jumlah > 0) {
-          keranjang[id] = Math.min(jumlah, 20);
-        }
-      });
-    }
-  } catch (e) {
-    keranjang = {};
-  }
-}
-
 /* ===================== render menu ====================== */
 
 function kartuHTML(item) {
@@ -230,7 +207,7 @@ function renderMenu() {
 function totalShotKopi(kecuali) {
   return idKopi.reduce(
     (jml, id) => jml + (id === kecuali ? 0 : keranjang[id] || 0),
-    0
+    0,
   );
 }
 
@@ -246,7 +223,7 @@ function ubahJumlah(id, selisih) {
     if (baru > sisa) {
       baru = Math.max(sekarang, sisa);
       toast(
-        `Varian kopi cuma sisa ${SISA_SHOT} shot espresso. Sisanya ambil menu non-kopi ya.`
+        `Varian kopi cuma sisa ${SISA_SHOT} shot espresso. Sisanya ambil menu non-kopi ya.`,
       );
     }
   }
@@ -254,7 +231,6 @@ function ubahJumlah(id, selisih) {
   if (baru === 0) delete keranjang[id];
   else keranjang[id] = baru;
 
-  simpan();
   perbarui();
 }
 
@@ -363,7 +339,7 @@ function perbarui() {
         <div class="struk-baris">
           <span>${i.nama}<br>${i.jumlah} x ${rupiah(i.harga)}</span>
           <b>${rupiah(i.subtotal)}</b>
-        </div>`
+        </div>`,
       )
       .join("");
   }
@@ -469,7 +445,7 @@ function susunPesan() {
   const daftar = isi
     .map(
       (i, urut) =>
-        `${urut + 1}. ${i.nama} x${i.jumlah} = ${rupiah(i.subtotal)}`
+        `${urut + 1}. ${i.nama} x${i.jumlah} = ${rupiah(i.subtotal)}`,
     )
     .join("\n");
 
@@ -600,19 +576,21 @@ function pasangEvent() {
     kirimPesanan();
   });
 
-  el("#cartbar").querySelector(".cartbar-go").addEventListener("click", () => {
-    setTimeout(() => el("#nama").focus({ preventScroll: true }), 600);
-  });
+  el("#cartbar")
+    .querySelector(".cartbar-go")
+    .addEventListener("click", () => {
+      setTimeout(() => el("#nama").focus({ preventScroll: true }), 600);
+    });
 }
 
 function mulai() {
   renderMenu();
-  muat();
   pasangEvent();
   perbarui();
 
   el("#footer-wa").href = `https://wa.me/${NOMOR_WA}`;
-  el("#hero-stock").innerHTML = `Varian kopi tinggal <strong>${SISA_SHOT} shot espresso</strong>. Siapa cepat dia dapat.`;
+  el("#hero-stock").innerHTML =
+    `Varian kopi tinggal <strong>${SISA_SHOT} shot espresso</strong>. Siapa cepat dia dapat.`;
   el("#tahun").textContent = new Date().getFullYear();
 }
 
