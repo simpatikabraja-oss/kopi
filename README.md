@@ -1,133 +1,77 @@
-# Kopi Kalcer — web PO
+# Kopi Kalcer — Professional PO Storefront
 
-Struktur filenya dipisah, gak digabung jadi satu:
+Situs ini sudah punya dua jalur checkout:
 
-```
-kopi-kalcer/
-├── index.html          <- isi halaman
-├── css/style.css       <- semua tampilan & warna
-├── js/script.js        <- menu, harga, keranjang, validasi, link WhatsApp
-└── img/                <- foto menu (sekarang masih bingkai kosong)
-```
+- **Cash saat ambil:** membuat pesan konfirmasi yang rapi ke WhatsApp.
+- **Bayar online:** membuat transaksi **Midtrans Snap** dari server, lalu pelanggan memilih QRIS, e-wallet, virtual account, atau metode yang tersedia pada akun merchant.
 
-Buka webnya: klik dua kali `index.html`.
+## Penting sebelum publikasi
 
----
+GitHub Pages hanya bisa menjalankan HTML, CSS, dan JavaScript. Ia **tidak boleh** menyimpan Midtrans Server Key dan tidak bisa menerima webhook pembayaran. Karena itu folder `api/` harus dideploy sebagai backend terpisah (contoh: Vercel), sedangkan situs tetap bisa dipasang di GitHub Pages.
 
-## 1. Ganti foto menu
+Jangan pernah menaruh `MIDTRANS_SERVER_KEY`, Supabase Service Role Key, PIN, atau OTP di `index.html`, `js/script.js`, atau repository GitHub.
 
-Foto yang ada sekarang cuma bingkai sementara. Cara gantinya:
+## Yang bisa diubah paling sering
 
-1. Siapkan foto, bentuknya **kotak (1:1)** biar pas.
-2. Ganti nama fotonya persis kayak nama file di bawah.
-3. Timpa file lama di folder `img/`.
-
-| File yang diganti                | Buat menu               |
-| -------------------------------- | ----------------------- |
-| `img/americano-melongo.jpg`      | Americano Melongo       |
-| `img/long-black-bikin-melek.jpg` | Long Black Bikin Melek  |
-| `img/butterscotch.jpg`           | Butterscotch            |
-| `img/surent.jpg`                 | SUREN'T                 |
-| `img/hazelnut-cenat-cenut.jpg`   | Hazelnut Cenat Cenut    |
-| `img/caramel-ora-ngomel.jpg`     | Caramel Ora Ngomel      |
-| `img/coklat-anti-bete.jpg`       | Coklat Anti Bete        |
-| `img/red-velvet-bikin-awet.jpg`  | Red Velvet Bikin Awet   |
-| `img/matcha-ceria.jpg`           | Matcha Ceria            |
-| `img/hero.jpg`                   | Foto besar di paling atas |
-| `img/suasana.jpg`                | Cadangan, belum dipakai |
-
-Nama filenya harus sama persis (huruf kecil semua, pakai tanda `-`).
-Kalau fotonya belum ada, bingkainya otomatis nulis "Foto menyusul" —
-jadi webnya tetap rapi, gak muncul gambar rusak.
-
----
-
-## 2. Ganti nomor WhatsApp
-
-Buka `js/script.js`, baris paling atas:
+Di `js/script.js`:
 
 ```js
-const NOMOR_WA = "6285711308141";
+const CONFIG = Object.freeze({
+  whatsappNumber: "6285711308141", // nomor admin, format 62...
+  espressoStock: 10, // stok tampilan untuk satu sesi PO
+  paymentApiUrl: "", // kosong sampai backend siap
+});
 ```
 
-Formatnya harus `62...`, tanpa tanda `+`, tanpa spasi, tanpa `-`.
-
----
-
-## 3. Ganti sisa stok espresso
-
-Masih di `js/script.js`:
+Untuk situs GitHub Pages, ganti `paymentApiUrl` setelah backend Vercel dibuat, misalnya:
 
 ```js
-const SISA_SHOT = 10;
+paymentApiUrl: "https://kopi-kalcer-payment.vercel.app/api/create-payment",
 ```
 
-Angka ini yang bikin total pesanan varian kopi gak bisa lewat dari stok.
-Kalau minggu depan stoknya beda, tinggal ganti angkanya.
+Menu yang ada di `js/script.js` juga **harus sama** dengan `CATALOG` di `api/create-payment.js`. Server sengaja menghitung ulang harga dari katalog server agar pelanggan tidak dapat mengubah nominal lewat browser.
 
----
+## Mengaktifkan pembayaran online dengan aman
 
-## 4. Tambah / ubah menu & harga
+1. **Buat akun Midtrans Sandbox** dan ambil Sandbox Server Key. Mulai dengan sandbox—jangan langsung memakai transaksi asli.
+2. **Buat project Supabase.** Buka SQL Editor, lalu jalankan isi [`database/schema.sql`](database/schema.sql).
+3. **Deploy folder proyek ini ke Vercel.** Endpoint yang akan tersedia adalah:
+   - `https://NAMA-PROJECT.vercel.app/api/create-payment`
+   - `https://NAMA-PROJECT.vercel.app/api/midtrans-webhook`
+4. Di Vercel → Settings → Environment Variables, isi seluruh variabel dalam [`.env.example`](.env.example). `APP_URL` harus URL situs GitHub Pages Anda tanpa garis miring terakhir; `ALLOWED_ORIGIN` adalah origin-nya, contoh `https://simpatikabraja-oss.github.io`.
+5. Di Midtrans dashboard, atur **Payment Notification URL** ke `https://NAMA-PROJECT.vercel.app/api/midtrans-webhook`.
+6. Ubah `paymentApiUrl` di `js/script.js` ke URL Vercel pada langkah 3, lalu publish situs ke GitHub Pages.
+7. Lakukan beberapa pembayaran **sandbox**. Pastikan transaksi terlihat di Midtrans dan baris pesanan di Supabase berubah menjadi `PAID` setelah webhook masuk.
+8. Setelah semua benar, masukkan **Production Server Key** baru dan set `MIDTRANS_IS_PRODUCTION=true` di Vercel. Jangan gunakan Server Key sandbox untuk produksi.
 
-Masih di `js/script.js`, bagian `const MENU`. Satu menu bentuknya gini:
+## Alur pembayaran
 
-```js
-{
-  id: "matcha-ceria",          // dipakai sistem, jangan pakai spasi
-  nama: "Matcha Ceria",        // yang tampil di web
-  harga: 13000,                // angka aja, tanpa titik
-  foto: "img/matcha-ceria.jpg",
-  desc: "Matcha susu yang segar, pahit-manisnya seimbang.",
-},
+```text
+Pelanggan → pilih menu → isi data → pilih “Bayar online”
+          → browser kirim ID menu + jumlah ke API
+          → API hitung ulang harga & simpan pesanan PENDING
+          → API meminta token Snap dengan Server Key rahasia
+          → pelanggan membayar di halaman Midtrans
+          → Midtrans mengirim webhook terverifikasi
+          → API mengubah status pesanan menjadi PAID / FAILED
 ```
 
-Mau nambah menu baru? Copy satu blok itu, tempel di bawahnya, ganti isinya,
-terus taruh fotonya di `img/` sesuai nama yang kamu tulis.
+Status `PAID` berasal dari webhook Midtrans, **bukan** dari tombol “sudah bayar” pelanggan. Hal ini penting agar pesanan palsu tidak dianggap lunas.
 
-Menu kopi masuk ke `MENU.kopi`, yang non-kopi ke `MENU.nonkopi`.
+## Refresh halaman
 
----
+Saat halaman dimuat ulang, keranjang dan data pelanggan di browser dikosongkan agar sesi belanja dimulai dari awal. Refresh tidak membatalkan pesanan yang sudah tercatat di backend atau transaksi yang sudah dibuat di gateway pembayaran.
 
-## 5. Alur pesanan
+## Pemeriksaan cepat
 
-1. Pembeli pilih minuman pakai tombol **Tambah / + / −**.
-2. Pesanan langsung muncul di struk sebelah kanan.
-3. Pembeli isi biodata: nama, kelas, nomor WhatsApp.
-4. Tombol **Pesan lewat WhatsApp** masih terkunci (ada gembok) selama
-   biodata belum lengkap atau keranjang masih kosong.
-5. Kalau dipencet pas belum lengkap, kolom yang kurang jadi merah dan
-   muncul peringatan — pesanan gak akan terkirim.
-6. Begitu lengkap, tombolnya kebuka. Dipencet → WhatsApp kebuka dengan
-   teks pesanan yang udah jadi, pembeli tinggal tekan kirim.
+Jalankan setelah Node.js tersedia:
 
-Contoh teks yang masuk ke WhatsApp kamu:
-
-```
-Halo Kopi Kalcer! Aku mau PO buat hari Kamis ya
-
-== BIODATA ==
-Nama   : Rangga Saputra
-Kelas  : 11G
-No. WA : 081234567890
-Ambil  : Pas istirahat ke-2 di kelas 11G
-Catatan: es dikit aja
-
-== PESANAN ==
-1. Americano Melongo x2 = Rp20.000
-2. Matcha Ceria x1 = Rp13.000
-
-Total 3 item = Rp33.000
-
-Bayar cash pas ambil. Makasih, lekk!
+```bash
+npm run check
 ```
 
----
+Untuk mengecek tampilan statis, buka `index.html` atau jalankan web server lokal sederhana. Pembayaran online baru aktif bila backend dan variabel environment sudah dipasang.
 
-## Catatan
+## Catatan stok
 
-- Butuh internet buat buka WhatsApp dan muat font.
-- Nomor tujuan harus nomor yang aktif WhatsApp-nya.
-- Pesanan **belum otomatis tercatat** di mana-mana. Web ini cuma bantu
-  nyusun pesanan rapi; yang jadi catatan resmi tetap chat WhatsApp kamu.
-- Isi keranjang tersimpan di browser pembeli, jadi gak hilang kalau
-  halamannya ke-refresh.
+`espressoStock` saat ini membatasi keranjang pada browser. Untuk stok yang benar-benar real-time saat banyak pembeli memesan bersamaan, stok perlu dipindahkan ke database dan dikunci secara atomik di backend. Jangan mengandalkan angka di browser untuk mengendalikan stok produksi.

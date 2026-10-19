@@ -1,12 +1,12 @@
 {
   "name": "kopi-kalcer",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Professional pre-order storefront with a secure Midtrans payment API.",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "check": "node --check js/script.js && node --check api/create-payment.js && node --check api/midtrans-webhook.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Kopi Kalcer",
   "license": "ISC"
 }
