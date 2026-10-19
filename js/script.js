@@ -11,9 +11,9 @@
 const CONFIG = Object.freeze({
   whatsappNumber: "6285711308141",
   espressoStock: 10,
-  // Isi dengan URL Vercel setelah backend Midtrans selesai dipasang.
-  // Contoh: "https://nama-proyek.vercel.app/api/create-payment"
-  paymentApiUrl: "",
+  paymentApiUrl: ["localhost", "127.0.0.1"].includes(window.location.hostname)
+    ? "http://localhost:3000/api/create-payment"
+    : "https://kopi-dusky-psi.vercel.app/api/create-payment",
   cartStorageKey: "kopi-kalcer-cart-v2",
   customerStorageKey: "kopi-kalcer-customer-v2",
   maxQuantityPerMenu: 20,
