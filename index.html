@@ -10,6 +10,42 @@
       name="description"
       content="Kopi Kalcer — pre-order minuman favoritmu, pembayaran online aman atau bayar saat ambil."
     />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="id_ID" />
+    <meta property="og:site_name" content="Kopi Kalcer" />
+    <meta property="og:title" content="Kopi Kalcer — Kopi enak, pesannya santai" />
+    <meta
+      property="og:description"
+      content="Racikan dingin yang siap nemenin tugas, cerita, dan jam istirahat. Pesan sekarang, ambil tinggal senyum."
+    />
+    <meta
+      property="og:url"
+      content="https://simpatikabraja-oss.github.io/kopi/"
+    />
+    <meta
+      property="og:image"
+      content="https://simpatikabraja-oss.github.io/kopi/img/hero.jpg"
+    />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="900" />
+    <meta property="og:image:height" content="1150" />
+    <meta
+      property="og:image:alt"
+      content="Segelas minuman Kopi Kalcer"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="Kopi Kalcer — Kopi enak, pesannya santai"
+    />
+    <meta
+      name="twitter:description"
+      content="Racikan dingin yang siap nemenin tugas, cerita, dan jam istirahat."
+    />
+    <meta
+      name="twitter:image"
+      content="https://simpatikabraja-oss.github.io/kopi/img/hero.jpg"
+    />
     <meta name="theme-color" content="#1d120e" />
     <meta name="color-scheme" content="light" />
     <title>Kopi Kalcer — Kopi enak, pesannya santai</title>
@@ -37,7 +73,10 @@
       <div class="announcement-inner">
         <span class="announcement-dot" aria-hidden="true"></span>
 
-        <p><strong>PO Kamis dibuka</strong> · Ambil saat istirahat ke-2</p>
+        <p>
+          <strong>Pre-order Kopi Kalcer</strong> · Pilih waktu pengambilan saat
+          checkout
+        </p>
 
         <a href="#cara-pesan">
           Cara pesan
@@ -59,6 +98,7 @@
       <nav class="topnav" aria-label="Navigasi utama">
         <a href="#menu">Menu</a>
         <a href="#cara-pesan">Cara pesan</a>
+        <a href="#ulasan">Ulasan</a>
         <a href="#tentang">Tentang kami</a>
       </nav>
 
@@ -84,7 +124,7 @@
           <div class="hero-copy">
             <p class="eyebrow">
               <span></span>
-              PRE-ORDER MINGGU INI
+              MENU &amp; PRE-ORDER
             </p>
 
             <h1 id="hero-title">
@@ -108,20 +148,20 @@
               </a>
             </div>
 
-            <div class="hero-proof" aria-label="Keunggulan Kopi Kalcer">
+            <div class="hero-proof" aria-label="Informasi Kopi Kalcer">
               <div>
-                <strong>4.9/5</strong>
-                <span>rating teman-teman</span>
+                <strong id="hero-menu-count">10</strong>
+                <span>pilihan minuman</span>
               </div>
 
               <div>
-                <strong id="hero-stock">10</strong>
-                <span>shot kopi tersisa</span>
+                <strong>Kopi</strong>
+                <span>dan non-kopi</span>
               </div>
 
               <div>
-                <strong>09.45</strong>
-                <span>mulai bisa diambil</span>
+                <strong>Cash / online</strong>
+                <span>pilih cara bayar</span>
               </div>
             </div>
           </div>
@@ -143,11 +183,11 @@
               />
 
               <figcaption>
-                <span>EDISI</span>
+                <span>KOPI KALCER</span>
 
                 <strong>
-                  KAMIS<br />
-                  CERIA
+                  PILIHAN<br />
+                  HARI INI
                 </strong>
 
                 <span>VOL. 01</span>
@@ -163,19 +203,19 @@
 
         <div class="marquee" aria-hidden="true">
           <div class="marquee-track">
-            <span>MINUM YANG ENAK</span>
+            <span>PILIH MENU FAVORITMU</span>
             <b>✦</b>
-            <span>PO SETIAP KAMIS</span>
-            <b>✦</b>
-
-            <span>MINUM YANG ENAK</span>
-            <b>✦</b>
-            <span>PO SETIAP KAMIS</span>
+            <span>COFFEE BREAK LEBIH SERU</span>
             <b>✦</b>
 
-            <span>MINUM YANG ENAK</span>
+            <span>PILIH MENU FAVORITMU</span>
             <b>✦</b>
-            <span>PO SETIAP KAMIS</span>
+            <span>COFFEE BREAK LEBIH SERU</span>
+            <b>✦</b>
+
+            <span>PILIH MENU FAVORITMU</span>
+            <b>✦</b>
+            <span>COFFEE BREAK LEBIH SERU</span>
             <b>✦</b>
           </div>
         </div>
@@ -233,16 +273,58 @@
             </p>
           </div>
 
-          <div class="menu-toolbar" aria-label="Informasi menu">
-            <p>
-              <span class="status-dot"></span>
-              Semua minuman dibuat segar untuk PO ini
-            </p>
+          <div class="menu-toolbar">
+            <label class="menu-search" for="menu-search">
+              <span aria-hidden="true">⌕</span>
+              <input
+                id="menu-search"
+                type="search"
+                placeholder="Cari minuman..."
+                autocomplete="off"
+                aria-describedby="menu-results"
+              />
+            </label>
 
-            <p class="menu-stock-badge" id="coffee-stock-badge">
-              10 shot espresso tersedia
-            </p>
+            <div
+              class="menu-filters"
+              id="menu-filters"
+              role="group"
+              aria-label="Jenis minuman"
+            >
+              <button
+                type="button"
+                class="menu-filter is-active"
+                data-menu-filter="all"
+                aria-pressed="true"
+              >
+                Semua
+              </button>
+              <button
+                type="button"
+                class="menu-filter"
+                data-menu-filter="kopi"
+                aria-pressed="false"
+              >
+                Kopi
+              </button>
+              <button
+                type="button"
+                class="menu-filter"
+                data-menu-filter="nonKopi"
+                aria-pressed="false"
+              >
+                Non-kopi
+              </button>
+            </div>
+
+            <p class="menu-count-badge" id="menu-count-badge">10 menu pilihan</p>
           </div>
+          <p
+            class="menu-results"
+            id="menu-results"
+            role="status"
+            aria-live="polite"
+          ></p>
 
           <section class="menu-group" aria-labelledby="kopi-title">
             <div class="menu-group-heading">
@@ -482,7 +564,7 @@
                   <h3>Kopi Kalcer</h3>
                 </div>
 
-                <span class="receipt-date" id="receipt-date">PO KAMIS</span>
+                <span class="receipt-date" id="receipt-date">PO KOPI KALCER</span>
               </div>
 
               <div class="receipt-divider"></div>
@@ -533,6 +615,120 @@
               Cash, QRIS, e-wallet &amp; virtual account tersedia
             </p>
           </aside>
+        </div>
+      </section>
+
+      <section class="reviews-section" id="ulasan" aria-labelledby="reviews-title">
+        <div class="wrap reviews-layout">
+          <div class="reviews-intro">
+            <p class="eyebrow eyebrow-dark">
+              <span></span>
+              CERITAKAN PENGALAMANMU
+            </p>
+
+            <h2 id="reviews-title">
+              Setiap tegukan<br />
+              punya <em>cerita.</em>
+            </h2>
+
+            <p>
+              Sudah pernah pesan? Rating dan masukanmu membantu kami menyajikan
+              minuman yang lebih baik.
+            </p>
+
+            <div class="review-example">
+              <span class="review-example-label">
+                CONTOH FORMAT — Braja
+              </span>
+              <blockquote>
+                “Minumannya enak, pas buat nemenin istirahat!”
+              </blockquote>
+            </div>
+            <p class="review-disclosure">
+              Ulasan hanya akan dipublikasikan setelah dikonfirmasi dan ditinjau
+              oleh toko.
+            </p>
+          </div>
+
+          <form class="review-form" id="review-form">
+            <div class="field">
+              <label for="review-name">Nama panggilan <small>(opsional)</small></label>
+              <input
+                id="review-name"
+                name="review-name"
+                type="text"
+                maxlength="40"
+                autocomplete="nickname"
+                placeholder="Contoh: Kak Rani"
+              />
+            </div>
+
+            <div class="field">
+              <label for="review-product">Menu yang dipesan</label>
+              <select id="review-product" name="review-product">
+                <option value="">Tidak terkait menu tertentu</option>
+              </select>
+            </div>
+
+            <fieldset class="review-rating">
+              <legend>Rating <span aria-hidden="true">*</span></legend>
+              <div class="review-stars">
+                <input id="review-rating-1" type="radio" name="review-rating" value="1" required />
+                <label for="review-rating-1" aria-label="1 dari 5 bintang">★</label>
+                <input id="review-rating-2" type="radio" name="review-rating" value="2" />
+                <label for="review-rating-2" aria-label="2 dari 5 bintang">★</label>
+                <input id="review-rating-3" type="radio" name="review-rating" value="3" />
+                <label for="review-rating-3" aria-label="3 dari 5 bintang">★</label>
+                <input id="review-rating-4" type="radio" name="review-rating" value="4" />
+                <label for="review-rating-4" aria-label="4 dari 5 bintang">★</label>
+                <input id="review-rating-5" type="radio" name="review-rating" value="5" />
+                <label for="review-rating-5" aria-label="5 dari 5 bintang">★</label>
+              </div>
+            </fieldset>
+
+            <div class="field">
+              <label for="review-message">Ulasanmu <span aria-hidden="true">*</span></label>
+              <textarea
+                id="review-message"
+                name="review-message"
+                rows="4"
+                maxlength="400"
+                placeholder="Ceritakan rasa atau pengalamanmu..."
+                required
+              ></textarea>
+              <p class="field-caption">
+                <span id="review-message-count" aria-live="polite">0</span>/400
+              </p>
+            </div>
+
+            <p class="review-error" id="review-error" role="alert" hidden></p>
+
+            <label class="review-consent" for="review-consent">
+              <input id="review-consent" name="review-consent" type="checkbox" />
+              <span>Saya mengizinkan ulasan ini ditampilkan di website setelah ditinjau.</span>
+            </label>
+
+            <button class="review-submit" type="submit">
+              Siapkan ulasan di WhatsApp
+              <span aria-hidden="true">↗</span>
+            </button>
+
+            <p class="review-privacy">
+              Ulasan dikirim ke WhatsApp toko dan tidak langsung tampil di website.
+            </p>
+
+            <a
+              class="review-whatsapp-link"
+              id="review-whatsapp-link"
+              href="#ulasan"
+              target="_blank"
+              rel="noopener noreferrer"
+              hidden
+            >
+              Buka WhatsApp untuk mengirim ulasan
+              <span aria-hidden="true">↗</span>
+            </a>
+          </form>
         </div>
       </section>
 
@@ -594,7 +790,7 @@
 
       <div class="wrap footer-bottom">
         <span>© <span id="tahun"></span> Kopi Kalcer</span>
-        <span>Made for Thursday breaks</span>
+        <span>Dibuat untuk jeda yang lebih seru</span>
       </div>
     </footer>
 
@@ -635,8 +831,6 @@
       <div class="product-dialog-content">
         <p class="dialog-kicker" id="detail-kategori"></p>
         <h3 id="detail-nama"></h3>
-
-        <div class="detail-rating" id="detail-rating"></div>
 
         <p id="detail-penjelasan"></p>
 

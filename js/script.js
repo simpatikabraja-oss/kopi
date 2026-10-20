@@ -27,8 +27,6 @@ const MENU = Object.freeze({
       price: 10000,
       image: "img/americano-melongo.jpg",
       description: "Hitam, tajam, langsung melek sampai jam pulang.",
-      rating: 4.7,
-      reviewCount: 48,
       detail:
         "Espresso dan air panas tanpa gula. Pahitnya jujur, aromanya langsung bangunin kepala sebelum pelajaran mulai.",
     },
@@ -38,8 +36,6 @@ const MENU = Object.freeze({
       price: 12000,
       image: "img/long-black-bikin-melek.jpg",
       description: "Espresso yang dituang ke air panas. Pahitnya pas.",
-      rating: 4.6,
-      reviewCount: 35,
       detail:
         "Espresso dituangkan belakangan di atas air panas supaya crema dan aromanya tetap nendang. Pahit, tapi masih ramah buat yang baru mulai.",
     },
@@ -49,8 +45,6 @@ const MENU = Object.freeze({
       price: 15000,
       image: "img/butterscotch.jpg",
       description: "Manis gurih ala karamel mentega, dingin dan creamy.",
-      rating: 4.9,
-      reviewCount: 52,
       detail:
         "Espresso, susu creamy, dan rasa butterscotch yang manis-gurih. Pilihan aman kalau mau ngopi tanpa rasa pahit yang terlalu galak.",
     },
@@ -60,8 +54,6 @@ const MENU = Object.freeze({
       price: 15000,
       image: "img/surent.jpg",
       description: "Racikan khas Kopi Kalcer yang cuma ada di sini.",
-      rating: 5.0,
-      reviewCount: 29,
       detail:
         "Racikan rahasia yang dibuat sampai ketemu takaran paling pas. Coba sekali biar paham kenapa minuman ini jadi legend di kelas 11G.",
     },
@@ -71,8 +63,6 @@ const MENU = Object.freeze({
       price: 15000,
       image: "img/hazelnut-cenat-cenut.jpg",
       description: "Wangi kacang hazelnut, lembut, gampang disukai.",
-      rating: 4.8,
-      reviewCount: 41,
       detail:
         "Wangi kacang hazelnut yang langsung keluar begitu gelas dibuka. Rasanya lembut dan manisnya pas, cocok buat yang tidak mau rasa terlalu galak.",
     },
@@ -82,8 +72,6 @@ const MENU = Object.freeze({
       price: 15000,
       image: "img/caramel-ora-ngomel.jpg",
       description: "Karamel manis buat hari yang bikin pengin ngomel.",
-      rating: 4.7,
-      reviewCount: 37,
       detail:
         "Karamel manis dan susu creamy dipadu espresso supaya tidak eneg. Cocok buat hari yang ramai dan tugas yang datangnya barengan.",
     },
@@ -95,8 +83,6 @@ const MENU = Object.freeze({
       price: 13000,
       image: "img/coklat-anti-bete.jpg",
       description: "Coklat kental dingin, aman buat yang anti kafein.",
-      rating: 4.8,
-      reviewCount: 44,
       detail:
         "Coklat kental, susu, dan tanpa kafein. Tetap enak buat menemani istirahat tanpa bikin kamu susah tidur nanti malam.",
     },
@@ -105,11 +91,9 @@ const MENU = Object.freeze({
       name: "Red Velvet Bikin Awet",
       price: 13000,
       image: "img/red-velvet-bikin-awet.jpg",
-      description: "Manis lembut warna merah, favorit yang cepat habis.",
-      rating: 4.9,
-      reviewCount: 56,
+      description: "Manis lembut dengan warna merah muda yang ceria.",
       detail:
-        "Rasa vanilla yang lembut dengan warna merah muda yang seru. Ini salah satu yang paling cepat habis setiap PO dibuka.",
+        "Rasa vanilla yang lembut dengan warna merah muda yang seru. Cocok buat teman istirahat atau belajar.",
     },
     {
       id: "matcha-ceria",
@@ -117,10 +101,17 @@ const MENU = Object.freeze({
       price: 13000,
       image: "img/matcha-ceria.jpg",
       description: "Matcha susu yang segar, pahit-manisnya seimbang.",
-      rating: 4.6,
-      reviewCount: 30,
       detail:
         "Matcha dan susu dengan rasa pahit-manis yang seimbang. Segar buat diminum siang hari saat mood mulai turun.",
+    },
+    {
+      id: "matcha-latte",
+      name: "Matcha Latte",
+      price: 15000,
+      image: "img/matcha.jpg",
+      description: "Matcha latte lembut dengan susu dan rasa teh hijau.",
+      detail:
+        "Matcha dengan susu lembut dan rasa teh hijau yang khas. Pilihan creamy untuk teman istirahat.",
     },
   ],
 });
@@ -142,13 +133,17 @@ const state = {
   toastTimer: null,
   isSubmitting: false,
   checkoutReference: null,
+  menuFilter: "all",
+  menuQuery: "",
 };
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 const money = (amount) => `Rp${Number(amount).toLocaleString("id-ID")}`;
 const onlinePaymentEnabled = () =>
-  Boolean(CONFIG.paymentApiUrl && /^https:\/\/|^\//.test(CONFIG.paymentApiUrl));
+  Boolean(
+    CONFIG.paymentApiUrl && /^https?:\/\/|^\//.test(CONFIG.paymentApiUrl),
+  );
 
 function escapeHtml(value) {
   return String(value).replace(
@@ -284,24 +279,18 @@ function showToast(message) {
   );
 }
 
-function starsHtml(rating) {
-  const width = Math.max(0, Math.min(100, (rating / 5) * 100));
-  return `<span class="rating" aria-label="Rating ${rating} dari 5"><span class="rating-base">★★★★★</span><span class="rating-fill" style="width:${width}%">★★★★★</span></span>`;
-}
-
 function productHtml(item, category) {
   const name = escapeHtml(item.name);
   const description = escapeHtml(item.description);
   return `
     <article class="product-card" data-product="${item.id}">
       <div class="product-photo" data-action="detail" data-id="${item.id}" role="button" tabindex="0" aria-label="Lihat detail ${name}">
-        <img src="${item.image}" alt="${name}" loading="lazy" />
+        <img src="${item.image}" alt="${name}" width="900" height="900" loading="lazy" decoding="async" />
         <span class="product-price">${money(item.price)}</span>
       </div>
       <div class="product-body">
         <p class="product-category">${category}</p>
         <h4>${name}</h4>
-        <div class="product-rating">${starsHtml(item.rating)}<strong>${item.rating.toFixed(1)}</strong><span>(${item.reviewCount})</span></div>
         <p class="product-description">${description}</p>
         <button class="product-detail" type="button" data-action="detail" data-id="${item.id}">Lihat detail <span aria-hidden="true">→</span></button>
         <div class="product-footer">
@@ -317,12 +306,51 @@ function productHtml(item, category) {
 }
 
 function renderMenu() {
-  $("#grid-kopi").innerHTML = MENU.kopi
-    .map((item) => productHtml(item, "Espresso series"))
-    .join("");
-  $("#grid-nonkopi").innerHTML = MENU.nonKopi
-    .map((item) => productHtml(item, "Non-coffee series"))
-    .join("");
+  const query = state.menuQuery.trim().toLocaleLowerCase("id-ID");
+  const groups = [
+    {
+      id: "kopi",
+      items: MENU.kopi,
+      grid: $("#grid-kopi"),
+      section: $("#grid-kopi").closest(".menu-group"),
+      label: "Espresso series",
+    },
+    {
+      id: "nonKopi",
+      items: MENU.nonKopi,
+      grid: $("#grid-nonkopi"),
+      section: $("#grid-nonkopi").closest(".menu-group"),
+      label: "Non-coffee series",
+    },
+  ];
+  let visibleCount = 0;
+
+  groups.forEach((group) => {
+    const visibleItems =
+      state.menuFilter === "all" || state.menuFilter === group.id
+        ? group.items.filter((item) =>
+            `${item.name} ${item.description} ${item.detail}`
+              .toLocaleLowerCase("id-ID")
+              .includes(query),
+          )
+        : [];
+    group.grid.innerHTML = visibleItems
+      .map((item) => productHtml(item, group.label))
+      .join("");
+    group.section.hidden = visibleItems.length === 0;
+    visibleCount += visibleItems.length;
+  });
+
+  $("#hero-menu-count").textContent = allMenu.length;
+  $("#menu-count-badge").textContent = `${visibleCount} dari ${allMenu.length} menu`;
+  $("#menu-results").textContent = visibleCount
+    ? `Menampilkan ${visibleCount} menu.`
+    : "Tidak ada menu yang cocok. Coba kata kunci atau filter lain.";
+  $$("[data-menu-filter]").forEach((button) => {
+    const selected = button.dataset.menuFilter === state.menuFilter;
+    button.classList.toggle("is-active", selected);
+    button.setAttribute("aria-pressed", String(selected));
+  });
 
   $$(".product-photo img").forEach((image) => {
     image.addEventListener(
@@ -331,6 +359,61 @@ function renderMenu() {
       { once: true },
     );
   });
+  renderProductQuantities();
+}
+
+function renderReviewProductOptions() {
+  const select = $("#review-product");
+  allMenu.forEach((item) => {
+    const option = document.createElement("option");
+    option.value = item.id;
+    option.textContent = item.name;
+    select.append(option);
+  });
+}
+
+function prepareReviewMessage(event) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const review = $("#review-message").value.trim();
+  const error = $("#review-error");
+  error.hidden = true;
+  error.textContent = "";
+
+  if (review.length < 5) {
+    error.textContent = "Tulis ulasan minimal 5 karakter, ya.";
+    error.hidden = false;
+    $("#review-message").focus();
+    return;
+  }
+
+  const rating = form.elements["review-rating"].value;
+  const productId = $("#review-product").value;
+  const productName = menuById.get(productId)?.name || "Tidak terkait menu tertentu";
+  const name = $("#review-name").value.trim() || "Anonim";
+  const consent = $("#review-consent").checked
+    ? "Ya, setelah ditinjau oleh toko."
+    : "Belum memberi izin untuk ditampilkan.";
+  const message = [
+    "Halo Kopi Kalcer! Aku mau kirim ulasan ☕",
+    "",
+    `Nama panggilan: ${name}`,
+    `Menu: ${productName}`,
+    `Rating: ${rating}/5`,
+    `Ulasan: ${review}`,
+    `Izin untuk ditampilkan: ${consent}`,
+  ].join("\n");
+  const link = $("#review-whatsapp-link");
+  link.href = `https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(message)}`;
+  link.hidden = false;
+  link.focus();
+}
+
+function handleMenuFilterClick(event) {
+  const button = event.target.closest("[data-menu-filter]");
+  if (!button) return;
+  state.menuFilter = button.dataset.menuFilter;
+  renderMenu();
 }
 
 function setQuantity(id, proposedQuantity, { announce = false } = {}) {
@@ -347,7 +430,7 @@ function setQuantity(id, proposedQuantity, { announce = false } = {}) {
       quantity = Math.max(0, availableForThisItem);
       if (proposedQuantity > previousQuantity)
         showToast(
-          `Shot espresso tinggal ${CONFIG.espressoStock}. Coba menu non-kopi juga, ya.`,
+          `Batas menu kopi espresso untuk satu pesanan adalah ${CONFIG.espressoStock} porsi.`,
         );
     }
   }
@@ -427,12 +510,6 @@ function renderCartBar() {
   badge.textContent = amount;
 }
 
-function renderStock() {
-  const remaining = remainingCoffeeShots();
-  $("#hero-stock").textContent = remaining;
-  $("#coffee-stock-badge").textContent = `${remaining} shot espresso tersedia`;
-}
-
 function cleanPhone(rawValue) {
   let digits = String(rawValue || "").replace(/\D/g, "");
   if (digits.startsWith("0")) digits = `62${digits.slice(1)}`;
@@ -502,7 +579,6 @@ function renderOrderState() {
   renderProductQuantities();
   renderReceipt();
   renderCartBar();
-  renderStock();
   renderCheckoutAvailability();
   renderDetailQuantity();
 }
@@ -530,8 +606,6 @@ function openProductDetail(id) {
   $("#detail-nama").textContent = item.name;
   $("#detail-harga").textContent = money(item.price);
   $("#detail-penjelasan").textContent = item.detail;
-  $("#detail-rating").innerHTML =
-    `<div class="product-rating">${starsHtml(item.rating)}<strong>${item.rating.toFixed(1)}</strong><span>(${item.reviewCount} ulasan)</span></div>`;
   renderDetailQuantity();
   openDialog($("#detail-modal"));
 }
@@ -739,8 +813,10 @@ async function startOnlinePayment() {
     $("#payment-error").textContent =
       error.name === "AbortError"
         ? "Server belum memberi jawaban dalam 20 detik. Cek apakah halaman pembayaran terbuka. Jika belum, hubungi toko sebelum mencoba lagi agar tidak membuat transaksi ganda."
-        : error.message ||
-          "Belum bisa membuat pembayaran online. Coba lagi atau pilih cash.";
+        : error instanceof TypeError
+          ? "Tidak dapat terhubung ke server pembayaran. Periksa koneksi internet, lalu coba lagi. Jika tetap gagal, hubungi toko untuk memeriksa server pembayaran."
+          : error.message ||
+            "Belum bisa membuat pembayaran online. Coba lagi atau pilih cash.";
     $("#payment-error").hidden = false;
     state.isSubmitting = false;
     submit.disabled = false;
@@ -791,6 +867,34 @@ function bindDialogs() {
 function bindEvents() {
   $("#menu").addEventListener("click", handleMenuClick);
   $("#menu").addEventListener("keydown", handleMenuKeyboard);
+  $("#review-product").replaceChildren(
+    new Option("Tidak terkait menu tertentu", ""),
+  );
+  renderReviewProductOptions();
+  $("#review-form").addEventListener("submit", prepareReviewMessage);
+  $("#review-message").addEventListener("input", (event) => {
+    $("#review-message-count").textContent = event.currentTarget.value.length;
+    $("#review-error").hidden = true;
+  });
+  $("#review-form").addEventListener("input", () => {
+    $("#review-whatsapp-link").hidden = true;
+  });
+  $("#review-form").addEventListener("change", () => {
+    $("#review-whatsapp-link").hidden = true;
+  });
+  $$('input[name="review-rating"]').forEach((input) =>
+    input.addEventListener("change", () => {
+      const rating = Number(input.value);
+      $$(".review-stars label").forEach((label, index) => {
+        label.classList.toggle("is-active", index < rating);
+      });
+    }),
+  );
+  $("#menu-filters").addEventListener("click", handleMenuFilterClick);
+  $("#menu-search").addEventListener("input", (event) => {
+    state.menuQuery = event.currentTarget.value;
+    renderMenu();
+  });
 
   ["nama", "kelas", "wa", "customer-email", "ambil", "catatan"].forEach(
     (id) => {

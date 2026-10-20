@@ -42,6 +42,7 @@ const CATALOG = Object.freeze({
     coffee: false,
   },
   "matcha-ceria": { name: "Matcha Ceria", price: 13000, coffee: false },
+  "matcha-latte": { name: "Matcha Latte", price: 15000, coffee: false },
 });
 
 const ESPRESSO_STOCK = 10;
@@ -50,10 +51,13 @@ const MAX_QUANTITY_PER_ITEM = 20;
 function setCors(req, res) {
   const allowedOrigin = process.env.ALLOWED_ORIGIN;
   const origin = req.headers.origin;
-  if (allowedOrigin && origin === allowedOrigin) {
-    res.setHeader("Access-Control-Allow-Origin", allowedOrigin);
-    res.setHeader("Vary", "Origin");
-  }
+  const allowedOrigins = new Set([
+    "https://simpatikabraja-oss.github.io",
+    ...(allowedOrigin ? [allowedOrigin] : []),
+  ]);
+  if (origin && allowedOrigins.has(origin))
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  res.setHeader("Vary", "Origin");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 }
