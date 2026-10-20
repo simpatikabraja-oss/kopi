@@ -456,7 +456,7 @@ function validateCustomer() {
   const customer = customerData();
   const errors = {};
   if (customer.name.length < 3) errors.nama = "Tulis nama lengkapmu dulu, ya.";
-  if (customer.className.length < 2) errors.kelas = "Isi kelas, misalnya 11G.";
+  if (customer.className.length < 2) errors.kelas = "Isi kelas, misalnya XI-G.";
   if (!customer.phone) errors.wa = "Nomor WhatsApp wajib diisi.";
   else if (!/^62\d{8,13}$/.test(customer.phone))
     errors.wa = "Nomornya belum valid. Contoh: 081234567890.";
@@ -709,10 +709,13 @@ async function startOnlinePayment() {
   state.isSubmitting = true;
   submit.disabled = true;
   $("#payment-submit-text").textContent = "Menyiapkan pembayaran…";
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), 20000);
 
   try {
     const response = await fetch(CONFIG.paymentApiUrl, {
       method: "POST",
+      signal: controller.signal,
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
@@ -734,12 +737,16 @@ async function startOnlinePayment() {
   } catch (error) {
     console.error("Payment start failed", error);
     $("#payment-error").textContent =
-      error.message ||
-      "Belum bisa membuat pembayaran online. Coba lagi atau pilih cash.";
+      error.name === "AbortError"
+        ? "Server belum memberi jawaban dalam 20 detik. Cek apakah halaman pembayaran terbuka. Jika belum, hubungi toko sebelum mencoba lagi agar tidak membuat transaksi ganda."
+        : error.message ||
+          "Belum bisa membuat pembayaran online. Coba lagi atau pilih cash.";
     $("#payment-error").hidden = false;
     state.isSubmitting = false;
     submit.disabled = false;
     $("#payment-submit-text").textContent = "Lanjut ke pembayaran aman";
+  } finally {
+    window.clearTimeout(timeoutId);
   }
 }
 
