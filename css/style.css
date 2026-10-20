@@ -1696,6 +1696,16 @@ dialog[open] {
   font-size: 0.67rem;
   line-height: 1.45;
 }
+.payment-error {
+  margin-top: 12px;
+  padding: 10px 12px;
+  color: #8b2f24;
+  background: #fff0ed;
+  border: 1px solid #e8b8b0;
+  border-radius: 9px;
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
 .payment-submit {
   margin-top: 16px;
 }

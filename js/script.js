@@ -650,6 +650,8 @@ function selectedPaymentMethod() {
 
 function setPaymentMethod(method) {
   if (method === "midtrans" && !onlinePaymentEnabled()) method = "cash";
+  $("#payment-error").hidden = true;
+  $("#payment-error").textContent = "";
   const inputs = $$('input[name="payment-method"]');
   inputs.forEach((input) => {
     const selected = input.value === method;
@@ -696,10 +698,14 @@ function serverPayload() {
 
 async function startOnlinePayment() {
   if (!onlinePaymentEnabled()) {
-    showToast("Pembayaran online belum diaktifkan oleh toko.");
+    $("#payment-error").textContent =
+      "Pembayaran online belum diaktifkan oleh toko. Silakan pilih cash atau hubungi toko.";
+    $("#payment-error").hidden = false;
     return;
   }
   const submit = $("#payment-submit");
+  $("#payment-error").hidden = true;
+  $("#payment-error").textContent = "";
   state.isSubmitting = true;
   submit.disabled = true;
   $("#payment-submit-text").textContent = "Menyiapkan pembayaran…";
@@ -727,10 +733,10 @@ async function startOnlinePayment() {
     window.location.assign(data.redirectUrl);
   } catch (error) {
     console.error("Payment start failed", error);
-    showToast(
+    $("#payment-error").textContent =
       error.message ||
-        "Belum bisa membuat pembayaran online. Coba lagi atau pilih cash.",
-    );
+      "Belum bisa membuat pembayaran online. Coba lagi atau pilih cash.";
+    $("#payment-error").hidden = false;
     state.isSubmitting = false;
     submit.disabled = false;
     $("#payment-submit-text").textContent = "Lanjut ke pembayaran aman";
