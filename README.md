@@ -31,6 +31,12 @@ paymentApiUrl: "https://kopi-kalcer-payment.vercel.app/api/create-payment",
 
 Menu yang ada di `js/script.js` juga **harus sama** dengan `CATALOG` di `api/create-payment.js`. Server sengaja menghitung ulang harga dari katalog server agar pelanggan tidak dapat mengubah nominal lewat browser.
 
+## Foto produk
+
+Hero dan menu Matcha Latte menggunakan foto produk asli di `img/matcha-latte-web.jpg`. Menu lain sengaja menampilkan placeholder yang rapi sampai foto produknya tersedia; jangan menggantinya dengan foto minuman yang berbeda. Setelah menambahkan foto asli ke folder `img/`, perbarui properti `image` dan set `photoAvailable: true` pada menu terkait di `js/script.js`. Gunakan foto dengan pencahayaan dan latar yang konsisten agar katalog terlihat profesional.
+
+Ulasan contoh tidak ditampilkan sebagai testimoni. Ulasan yang dikirim lewat WhatsApp perlu ditinjau dan mendapat izin sebelum dipublikasikan.
+
 ## Mengaktifkan pembayaran online dengan aman
 
 1. **Buat akun Midtrans Sandbox** dan ambil Sandbox Server Key. Mulai dengan sandbox—jangan langsung memakai transaksi asli.

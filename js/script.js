@@ -11,6 +11,7 @@
 const CONFIG = Object.freeze({
   whatsappNumber: "6285711308141",
   espressoStock: 10,
+  onlinePaymentsEnabled: false,
   paymentApiUrl: ["localhost", "127.0.0.1"].includes(window.location.hostname)
     ? "http://localhost:3000/api/create-payment"
     : "https://kopi-dusky-psi.vercel.app/api/create-payment",
@@ -108,7 +109,8 @@ const MENU = Object.freeze({
       id: "matcha-latte",
       name: "Matcha Latte",
       price: 15000,
-      image: "img/matcha.jpg",
+      image: "img/matcha-latte-web.jpg",
+      photoAvailable: true,
       description: "Matcha latte lembut dengan susu dan rasa teh hijau.",
       detail:
         "Matcha dengan susu lembut dan rasa teh hijau yang khas. Pilihan creamy untuk teman istirahat.",
@@ -131,6 +133,7 @@ const state = {
   cart: loadCart(),
   activeProductId: null,
   toastTimer: null,
+  cartAnimationTimer: null,
   isSubmitting: false,
   checkoutReference: null,
   menuFilter: "all",
@@ -142,7 +145,9 @@ const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 const money = (amount) => `Rp${Number(amount).toLocaleString("id-ID")}`;
 const onlinePaymentEnabled = () =>
   Boolean(
-    CONFIG.paymentApiUrl && /^https?:\/\/|^\//.test(CONFIG.paymentApiUrl),
+    CONFIG.onlinePaymentsEnabled &&
+    CONFIG.paymentApiUrl &&
+    /^https?:\/\/|^\//.test(CONFIG.paymentApiUrl),
   );
 
 function escapeHtml(value) {
@@ -279,13 +284,99 @@ function showToast(message) {
   );
 }
 
+function flyProductToCart(id, sourceElement) {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+  const item = menuById.get(id);
+  const target = $(".cart-trigger");
+  const productPhoto =
+    sourceElement?.closest(".product-card")?.querySelector(".product-photo") ||
+    $(`[data-product="${id}"] .product-photo`);
+  const source =
+    sourceElement?.matches("img, .detail-photo-placeholder") &&
+    sourceElement.getClientRects().length
+      ? sourceElement
+      : productPhoto?.querySelector("img:not([hidden])") || productPhoto;
+  if (!item || !target || !source) return;
+
+  const sourceRect = source.getBoundingClientRect();
+  const targetRect = target.getBoundingClientRect();
+  if (!sourceRect.width || !sourceRect.height || !targetRect.width) return;
+
+  const size = Math.min(64, sourceRect.width, sourceRect.height);
+  const startX = sourceRect.left + sourceRect.width / 2 - size / 2;
+  const startY = sourceRect.top + sourceRect.height / 2 - size / 2;
+  const deltaX = targetRect.left + targetRect.width / 2 - (startX + size / 2);
+  const deltaY = targetRect.top + targetRect.height / 2 - (startY + size / 2);
+  const flyer = document.createElement(
+    source.tagName === "IMG" ? "img" : "div",
+  );
+  flyer.className = "cart-flight";
+  flyer.alt = "";
+  flyer.setAttribute("aria-hidden", "true");
+  if (source.tagName === "IMG") flyer.src = item.image;
+  else {
+    flyer.classList.add("cart-flight-label");
+    flyer.textContent = item.name;
+  }
+  flyer.style.width = `${size}px`;
+  flyer.style.height = `${size}px`;
+  flyer.style.left = `${startX}px`;
+  flyer.style.top = `${startY}px`;
+  document.body.append(flyer);
+
+  if (typeof flyer.animate !== "function") {
+    flyer.remove();
+    return;
+  }
+
+  const animation = flyer.animate(
+    [
+      { transform: "translate(0, 0) scale(1)", opacity: 1, offset: 0 },
+      {
+        transform: `translate(${deltaX * 0.52}px, ${deltaY * 0.52 - 48}px) scale(0.72)`,
+        opacity: 0.92,
+        offset: 0.58,
+      },
+      {
+        transform: `translate(${deltaX}px, ${deltaY}px) scale(0.18)`,
+        opacity: 0,
+        offset: 1,
+      },
+    ],
+    {
+      duration: 720,
+      easing: "cubic-bezier(0.2, 0.72, 0.25, 1)",
+      fill: "forwards",
+    },
+  );
+  const removeFlyer = () => {
+    flyer.remove();
+    animation.cancel();
+  };
+  animation.onfinish = removeFlyer;
+  window.setTimeout(removeFlyer, 1200);
+
+  target.classList.remove("is-bumping");
+  void target.offsetWidth;
+  target.classList.add("is-bumping");
+  clearTimeout(state.cartAnimationTimer);
+  state.cartAnimationTimer = window.setTimeout(
+    () => target.classList.remove("is-bumping"),
+    420,
+  );
+}
+
 function productHtml(item, category) {
   const name = escapeHtml(item.name);
   const description = escapeHtml(item.description);
+  const photo = item.photoAvailable
+    ? `<img src="${item.image}" alt="${name}" width="1200" height="1600" loading="lazy" decoding="async" />`
+    : `<span class="product-photo-placeholder" aria-hidden="true"><span>FOTO PRODUK</span><strong>Foto belum tersedia</strong></span>`;
   return `
     <article class="product-card" data-product="${item.id}">
       <div class="product-photo" data-action="detail" data-id="${item.id}" role="button" tabindex="0" aria-label="Lihat detail ${name}">
-        <img src="${item.image}" alt="${name}" width="900" height="900" loading="lazy" decoding="async" />
+        ${photo}
         <span class="product-price">${money(item.price)}</span>
       </div>
       <div class="product-body">
@@ -342,7 +433,8 @@ function renderMenu() {
   });
 
   $("#hero-menu-count").textContent = allMenu.length;
-  $("#menu-count-badge").textContent = `${visibleCount} dari ${allMenu.length} menu`;
+  $("#menu-count-badge").textContent =
+    `${visibleCount} dari ${allMenu.length} menu`;
   $("#menu-results").textContent = visibleCount
     ? `Menampilkan ${visibleCount} menu.`
     : "Tidak ada menu yang cocok. Coba kata kunci atau filter lain.";
@@ -389,7 +481,8 @@ function prepareReviewMessage(event) {
 
   const rating = form.elements["review-rating"].value;
   const productId = $("#review-product").value;
-  const productName = menuById.get(productId)?.name || "Tidak terkait menu tertentu";
+  const productName =
+    menuById.get(productId)?.name || "Tidak terkait menu tertentu";
   const name = $("#review-name").value.trim() || "Anonim";
   const consent = $("#review-consent").checked
     ? "Ya, setelah ditinjau oleh toko."
@@ -416,7 +509,11 @@ function handleMenuFilterClick(event) {
   renderMenu();
 }
 
-function setQuantity(id, proposedQuantity, { announce = false } = {}) {
+function setQuantity(
+  id,
+  proposedQuantity,
+  { announce = false, source = null } = {},
+) {
   if (!menuById.has(id)) return;
   const previousQuantity = state.cart[id] || 0;
   let quantity = Math.max(
@@ -441,8 +538,10 @@ function setQuantity(id, proposedQuantity, { announce = false } = {}) {
   saveCart();
   renderOrderState();
 
-  if (announce && quantity > previousQuantity)
+  if (announce && quantity > previousQuantity) {
+    flyProductToCart(id, source);
     showToast(`${menuById.get(id).name} masuk ke keranjang.`);
+  }
 }
 
 function changeQuantity(id, change, options) {
@@ -598,8 +697,15 @@ function openProductDetail(id) {
   if (!item) return;
   state.activeProductId = id;
   const image = $("#detail-foto");
-  image.src = item.image;
+  image.hidden = !item.photoAvailable;
+  if (item.photoAvailable) image.src = item.image;
+  else image.removeAttribute("src");
   image.alt = item.name;
+  const imagePlaceholder = $("#detail-foto-placeholder");
+  imagePlaceholder.hidden = Boolean(item.photoAvailable);
+  imagePlaceholder.textContent = item.photoAvailable
+    ? ""
+    : `Foto ${item.name} belum tersedia`;
   $("#detail-kategori").textContent = coffeeIds.has(id)
     ? "Espresso series"
     : "Non-coffee series";
@@ -622,7 +728,8 @@ function handleMenuClick(event) {
   if (!control) return;
   const { action, id } = control.dataset;
   if (action === "detail") return openProductDetail(id);
-  if (action === "increment") return changeQuantity(id, 1, { announce: true });
+  if (action === "increment")
+    return changeQuantity(id, 1, { announce: true, source: control });
   if (action === "decrement") return changeQuantity(id, -1);
 }
 
@@ -859,7 +966,12 @@ function bindDialogs() {
   );
   $("#detail-tambah-cta").addEventListener("click", () => {
     if (!state.activeProductId) return;
-    changeQuantity(state.activeProductId, 1, { announce: true });
+    changeQuantity(state.activeProductId, 1, {
+      announce: true,
+      source: $("#detail-foto").hidden
+        ? $("#detail-foto-placeholder")
+        : $("#detail-foto"),
+    });
     closeDialog($("#detail-modal"));
   });
 }
@@ -937,11 +1049,11 @@ function configurePaymentAvailability() {
   onlineInput.disabled = true;
   onlineLabel.classList.add("is-unavailable");
   onlineLabel.querySelector(".method-copy strong").textContent =
-    "Bayar online — segera aktif";
+    "Pembayaran online belum tersedia";
   onlineLabel.querySelector(".method-copy small").textContent =
-    "Aktif setelah gateway pembayaran toko disambungkan";
+    "Silakan pilih bayar cash saat ambil";
   $(".payment-preview").innerHTML =
-    '<span aria-hidden="true">⌁</span> Pembayaran cash tersedia · pembayaran online sedang disiapkan';
+    '<span aria-hidden="true">⌁</span> Pembayaran online belum tersedia · bayar cash saat ambil';
 }
 
 function showPaymentReturnMessage() {
